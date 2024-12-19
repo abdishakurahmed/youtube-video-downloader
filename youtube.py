@@ -1,5 +1,6 @@
 from tqdm import tqdm
 import yt_dlp
+import os
 
 class ProgressBar:
     def __init__(self):
@@ -16,14 +17,28 @@ class ProgressBar:
         elif d["status"] == "finished":
             if self.pbar:
                 self.pbar.close()
-                print("Download complete!")
+                print(f"Download complete! Saved to {d['filename']}")
 
-url = "https://www.youtube.com/watch?v=g8p7rYscp04.com/watch?v=-hlwlML6pEg"
+# Prompt for custom download folder
+download_folder = input("Enter the path to the download folder (leave blank for current directory): ").strip()
+
+# Use the current directory if no folder is specified
+if not download_folder:
+    download_folder = os.getcwd()
+
+# Ensure the folder exists
+if not os.path.exists(download_folder):
+    os.makedirs(download_folder)
+
+# Video URL
+url = "Enter youtube video url here"
 
 progress = ProgressBar()
 ydl_opts = {
-    "format": "bestvideo[height<=720]+bestaudio/best",
+    "format": "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]",
+    "merge_output_format": "mp4",
     "progress_hooks": [progress.hook],
+    "outtmpl": os.path.join(download_folder, "%(title)s.%(ext)s"),  # Save file to the specified folder
 }
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
